@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Chagra: Aula Viva y Entorno Personal de Aprendizaje (PLE)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Merriweather -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Font Awesome para iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            chagra: {
+              dark: '#1e3f1a',
+              primary: '#2d5a27',
+              medium: '#4a7c44',
+              light: '#e8f3e6',
+              bg: '#f8faf8',
+            },
+            tierra: {
+              dark: '#78350f',
+              primary: '#b45309',
+              warm: '#d97706',
+              light: '#fef3c7',
+              soft: '#fffbeb',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Merriweather', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #f8faf8;
+      color: #1f2937;
+    }
+    .tab-active {
+      background-color: #2d5a27;
+      color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(45, 90, 39, 0.25);
+    }
+    .tab-inactive {
+      background-color: #ffffff;
+      color: #2d5a27;
+      border: 1px solid #d1e2cf;
+    }
+    .tab-inactive:hover {
+      background-color: #e8f3e6;
+    }
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- Barra de notificación / Toast -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Encabezado Institucional y Hero -->
+  <header class="bg-gradient-to-r from-chagra-dark via-chagra-primary to-chagra-medium text-white shadow-lg">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-tierra-light">
+            <i class="fa-solid fa-seedling"></i>
+            <span>Maestría en Educación Virtual · Universidad de Nariño</span>
+          </div>
+          <h1 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
+            La Chagra: Aula Viva y Entorno Personal de Aprendizaje (PLE)
+          </h1>
+          <p class="text-sm sm:text-base text-green-100 max-w-3xl">
+            Sede 14 El Pedregal · Institución Educativa Media Académica Sagrado Corazón de Jesús (Modalidad Multigrado) · San Lorenzo, Nariño
+          </p>
+        </div>
+
+        <!-- Botón de Configuración / Exportar HTML -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <button onclick="openConfigModal()" class="inline-flex items-center gap-2 bg-tierra-warm hover:bg-tierra-primary text-white font-semibold px-4 py-2.5 rounded-xl shadow transition cursor-pointer text-sm">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Configurar Enlaces / Exportar HTML</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Navegación por Pestañas del PLE -->
+      <nav aria-label="Navegación del PLE" class="mt-6 pt-4 border-t border-white/20 flex flex-wrap gap-2">
+        <button id="btn-tab-inicio" onclick="switchTab('inicio')" class="tab-active inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">
+          <i class="fa-solid fa-house-chimney"></i>
+          <span>1. Inicio y Proyecto</span>
+        </button>
+        <button id="btn-tab-leer" onclick="switchTab('leer')" class="tab-inactive inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">
+          <i class="fa-solid fa-book-open-reader"></i>
+          <span>2. Acceder y Leer</span>
+        </button>
+        <button id="btn-tab-hacer" onclick="switchTab('hacer')" class="tab-inactive inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">
+          <i class="fa-solid fa-pen-ruler"></i>
+          <span>3. Hacer y Reflexionar</span>
+        </button>
+        <button id="btn-tab-compartir" onclick="switchTab('compartir')" class="tab-inactive inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition cursor-pointer">
+          <i class="fa-solid fa-people-group"></i>
+          <span>4. Compartir en Comunidad (PLN)</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
+
+    <!-- ========================================================= -->
+    <!-- PESTAÑA 1: INICIO Y PROYECTO                              -->
+    <!-- ========================================================= -->
+    <section id="tab-inicio" class="space-y-8">
+      <!-- Tarjeta de Presentación del Proyecto -->
+      <div class="bg-white rounded-2xl shadow-sm border border-green-100 p-6 sm:p-8">
+        <div class="flex flex-col lg:flex-row gap-6 items-start">
+          <div class="flex-1 space-y-4">
+            <span class="inline-block bg-chagra-light text-chagra-primary font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider">
+              Contexto Investigativo · Vereda El Pedregal
+            </span>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-chagra-dark">
+              La chagra como espacio pedagógico para la enseñanza de la educación ambiental
+            </h2>
+            <p class="text-gray-700 leading-relaxed text-sm sm:text-base">
+              Este Entorno Personal de Aprendizaje (PLE), desarrollado por la docente investigadora <strong>Alba Lucy Revelo Chasoy</strong>, articula los saberes propios campesinos con el currículo de Ciencias Naturales y Educación Ambiental para estudiantes de los grados <strong>0° a 5° en modalidad multigrado</strong> de la Sede 14 El Pedregal (San Lorenzo, Nariño).
+            </p>
+            <p class="text-gray-700 leading-relaxed text-sm sm:text-base">
+              Frente a desafíos territoriales como el manejo de residuos sólidos, la deforestación, el uso de agroquímicos, la disminución de cauces de agua y la pérdida de semillas nativas, la chagra escolar se consolida como un aula viva de encuentro intergeneracional entre estudiantes, familias, sabedores y herramientas digitales Web 2.0.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-3">
+              <a id="link-mindomo-hero" href="https://www.mindomo.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-chagra-primary hover:bg-chagra-dark text-white font-semibold px-4 py-2.5 rounded-xl text-sm shadow transition">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span>Abrir Mapa Mental en Mindomo</span>
+              </a>
+              <a id="link-symbaloo-hero" href="https://www.symbaloo.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-tierra-light hover:bg-amber-200 text-tierra-dark font-semibold px-4 py-2.5 rounded-xl text-sm border border-amber-300 transition">
+                <i class="fa-solid fa-table-cells"></i>
+                <span>Abrir Tablero Symbaloo EDU</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Ficha Resumen Metodológica -->
+          <div class="w-full lg:w-80 bg-chagra-bg border border-green-200 rounded-2xl p-5 space-y-3 shrink-0">
+            <h3 class="font-bold text-chagra-dark text-sm uppercase tracking-wide flex items-center gap-2">
+              <i class="fa-solid fa-clipboard-check text-chagra-medium"></i>
+              <span>Ficha del Proyecto</span>
+            </h3>
+            <ul class="text-xs sm:text-sm space-y-2.5 text-gray-700">
+              <li><strong>Investigadora:</strong> Alba Lucy Revelo Chasoy</li>
+              <li><strong>Institución:</strong> I.E. Media Académica Sagrado Corazón de Jesús – Sede 14 El Pedregal</li>
+              <li><strong>Población:</strong> Estudiantes multigrado (0° a 5°), familias y sabedores campesinos</li>
+              <li><strong>Sustento PLE:</strong> Castaño Garrido et al. (2016); Castañeda y Adell (2013)</li>
+              <li><strong>Colección Curada:</strong> 15 recursos (5 Leer · 5 Hacer · 5 Compartir)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagrama Interactivo de las 3 Ramas del Mapa Mental -->
+      <div class="bg-white rounded-2xl shadow-sm border border-green-100 p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
+          <div>
+            <h2 class="font-serif text-xl font-bold text-chagra-dark">
+              Anatomía del PLE y Mapa Mental: Herramientas Web 2.0
+            </h2>
+            <p class="text-sm text-gray-600">
+              Haz clic en cada rama para explorar las preguntas orientadoras, actividades y conexión comunitaria (Castaño Garrido et al., 2016).
+            </p>
+          </div>
+          <span class="inline-flex items-center gap-1.5 text-xs font-medium bg-amber-50 text-tierra-dark px-3 py-1.5 rounded-lg border border-amber-200">
+            <i class="fa-solid fa-circle-nodes text-tierra-warm"></i>
+            <span>Nodo central: Herramientas Web 2.0 en un PLE</span>
+          </span>
+        </div>
+
+        <!-- 3 Ramas Interactivas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Rama 1 -->
+          <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50/40 p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="bg-emerald-700 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Rama 1 · LEER</span>
+                <i class="fa-solid fa-book-open text-emerald-700 text-lg"></i>
+              </div>
+              <h3 class="font-bold text-gray-900 text-base">Acceder a información y leer</h3>
+              <p class="text-xs italic text-emerald-900 bg-white/80 p-2.5 rounded-lg border border-emerald-100">
+                "¿Qué fuente consultaría y cómo seleccionaría la información?"
+              </p>
+              <div id="rama1-detail" class="text-xs sm:text-sm text-gray-700 space-y-2">
+                <p><strong>Fuentes:</strong> Repositorios científicos (Redalyc, SIRED Udenar, Colombia Aprende) y relatos orales de sabedores.</p>
+                <p><strong>Herramienta vinculada:</strong> <em>Symbaloo EDU</em> para filtrar y organizar guías sobre suelos, semillas nativas y educación ambiental.</p>
+              </div>
+            </div>
+            <button onclick="switchTab('leer')" class="w-full py-2 px-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl transition cursor-pointer">
+              Ir a fuentes de lectura →
+            </button>
+          </div>
+
+          <!-- Rama 2 -->
+          <div class="rounded-2xl border-2 border-amber-200 bg-amber-50/40 p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="bg-tierra-warm text-white text-xs font-bold px-2.5 py-1 rounded-lg">Rama 2 · HACER</span>
+                <i class="fa-solid fa-seedling text-tierra-warm text-lg"></i>
+              </div>
+              <h3 class="font-bold text-gray-900 text-base">Hacer y reflexionar</h3>
+              <p class="text-xs italic text-amber-900 bg-white/80 p-2.5 rounded-lg border border-amber-100">
+                "¿Qué elaboraría a partir de lo consultado?"
+              </p>
+              <div id="rama2-detail" class="text-xs sm:text-sm text-gray-700 space-y-2">
+                <p><strong>Producción:</strong> Bitácoras de observación de la chagra, mapas de cultivos asociados e infografías de semillas propias.</p>
+                <p><strong>Herramienta vinculada:</strong> <em>Google Docs</em> para redactar en colaboración el cuaderno de campo multigrado.</p>
+              </div>
+            </div>
+            <button onclick="switchTab('hacer')" class="w-full py-2 px-3 bg-tierra-warm hover:bg-tierra-primary text-white text-xs font-semibold rounded-xl transition cursor-pointer">
+              Ir al cuaderno de campo →
+            </button>
+          </div>
+
+          <!-- Rama 3 -->
+          <div class="rounded-2xl border-2 border-teal-200 bg-teal-50/40 p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="bg-teal-700 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Rama 3 · COMPARTIR</span>
+                <i class="fa-solid fa-comments text-teal-700 text-lg"></i>
+              </div>
+              <h3 class="font-bold text-gray-900 text-base">Compartir y aprender con otros (PLN)</h3>
+              <p class="text-xs italic text-teal-900 bg-white/80 p-2.5 rounded-lg border border-teal-100">
+                "¿Con quién contrastaría sus ideas y cómo aprovecharía sus aportes?"
+              </p>
+              <div id="rama3-detail" class="text-xs sm:text-sm text-gray-700 space-y-2">
+                <p><strong>Red (PLN):</strong> Padres, abuelos, sabedores de El Pedregal, compañeros de maestría y docentes rurales.</p>
+                <p><strong>Herramienta vinculada:</strong> <em>Padlet</em> como muro colaborativo para validar saberes campesinos y recetas tradicionales.</p>
+              </div>
+            </div>
+            <button onclick="switchTab('compartir')" class="w-full py-2 px-3 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-xl transition cursor-pointer">
+              Ir al muro comunitario →
+            </button>
+          </div>
+        </div>
+
+        <!-- Conexión rotulada entre ramas (requisito del mapa mental) -->
+        <div class="bg-chagra-light/70 border border-green-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+          <div class="flex items-center gap-2.5 text-chagra-dark">
+            <span class="bg-chagra-primary text-white px-2.5 py-1 rounded-md font-bold text-xs">Conexión entre ramas</span>
+            <span><strong>Hacer y reflexionar</strong> ⟷ <em>"Sistematiza y retroalimenta en comunidad"</em> ⟷ <strong>Compartir y aprender con otros</strong></span>
+          </div>
+          <span class="text-gray-600 font-medium">Ref.: Castaño Garrido et al. (2016)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PESTAÑA 2: ACCEDER Y LEER                                 -->
+    <!-- ========================================================= -->
+    <section id="tab-leer" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-green-100 p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-chagra-dark">
+              Manantiales de Conocimiento: Fuentes y Repositorios Curados
+            </h2>
+            <p class="text-sm text-gray-600 mt-1">
+              Recursos académicos y pedagógicos seleccionados para fundamentar la chagra como aula viva en la Sede 14 El Pedregal.
+            </p>
+          </div>
+          <button onclick="downloadOfflineGuide()" class="inline-flex items-center justify-center gap-2 bg-chagra-primary hover:bg-chagra-dark text-white font-semibold px-4 py-2.5 rounded-xl text-sm shadow transition cursor-pointer shrink-0">
+            <i class="fa-solid fa-file-arrow-down"></i>
+            <span>Descargar Guía de Campo Offline (.txt)</span>
+          </button>
+        </div>
+
+        <!-- Buscador y Filtro -->
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-grow">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
+            <input type="text" id="search-resources" oninput="filterResources()" placeholder="Buscar por palabra clave (suelo, semillas, Nariño, multigrado...)" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-chagra-medium text-sm" />
+          </div>
+          <select id="filter-resource-type" onchange="filterResources()" class="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-chagra-medium">
+            <option value="all">Todos los formatos (5)</option>
+            <option value="repositorio">Repositorios y Portales</option>
+            <option value="cientifico">Artículos y Tesis</option>
+            <option value="audiovisual">Audiovisual</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Grid de Recursos Curados -->
+      <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Se renderiza dinámicamente mediante JS -->
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PESTAÑA 3: HACER Y REFLEXIONAR                            -->
+    <!-- ========================================================= -->
+    <section id="tab-hacer" class="hidden space-y-6">
+      <!-- Herramientas de Producción -->
+      <div class="bg-white rounded-2xl shadow-sm border border-green-100 p-6">
+        <h2 class="font-serif text-xl sm:text-2xl font-bold text-chagra-dark">
+          Herramientas de Producción y Reconstrucción del Saber
+        </h2>
+        <p class="text-sm text-gray-600 mt-1">
+          Espacios digitales donde los estudiantes multigrado y la docente transforman la práctica agrícola en conocimiento sistematizado.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
+          <a href="https://docs.google.com/" target="_blank" rel="noopener noreferrer" class="card-hover block p-4 rounded-xl border border-blue-100 bg-blue-50/40">
+            <div class="flex items-center gap-2.5 font-bold text-blue-900 text-sm">
+              <i class="fa-solid fa-file-lines text-blue-600 text-lg"></i>
+              <span>Google Docs</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-2">Cuaderno de campo colaborativo y transcripción de relatos de sabedores.</p>
+          </a>
+
+          <a href="https://gitmind.com/es/" target="_blank" rel="noopener noreferrer" class="card-hover block p-4 rounded-xl border border-purple-100 bg-purple-50/40">
+            <div class="flex items-center gap-2.5 font-bold text-purple-900 text-sm">
+              <i class="fa-solid fa-diagram-project text-purple-600 text-lg"></i>
+              <span>GitMind</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-2">Mapas conceptuales sobre cultivos asociados (maíz, fríjol, calabaza) y plantas medicinales.</p>
+          </a>
+
+          <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" class="card-hover block p-4 rounded-xl border border-cyan-100 bg-cyan-50/40">
+            <div class="flex items-center gap-2.5 font-bold text-cyan-900 text-sm">
+              <i class="fa-solid fa-palette text-cyan-600 text-lg"></i>
+              <span>Canva Educación</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-2">Infografías ilustradas sobre semillas nativas, compostaje y cuidado del agua.</p>
+          </a>
+
+          <a href="https://calendar.google.com/" target="_blank" rel="noopener noreferrer" class="card-hover block p-4 rounded-xl border border-amber-100 bg-amber-50/40">
+            <div class="flex items-center gap-2.5 font-bold text-amber-900 text-sm">
+              <i class="fa-solid fa-calendar-days text-amber-600 text-lg"></i>
+              <span>Google Calendar</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-2">Cronograma lunar y agrícola para siembra, deshierbe y cosecha escolar.</p>
+          </a>
+        </div>
+      </div>
+
+      <!-- Cuaderno de Campo Interactivo de la Chagra (Editable y Persistente) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Formulario de Registro -->
+        <div class="bg-white rounded-2xl shadow-sm border border-green-100 p-6 h-fit space-y-4">
+          <div class="flex items-center gap-2 text-chagra-dark">
+            <i class="fa-solid fa-book-medical text-chagra-primary text-lg"></i>
+            <h3 class="font-serif text-lg font-bold">Nuevo Registro de Campo</h3>
+          </div>
+          <p class="text-xs text-gray-600">
+            Documenta las jornadas en la chagra de El Pedregal. Los registros se guardan automáticamente en este navegador y se incluyen al exportar la página.
+          </p>
+
+          <form id="field-log-form" onsubmit="addFieldLog(event)" class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Fecha de la jornada</label>
+              <input type="date" id="log-date" required class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-chagra-medium" />
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Fase lunar</label>
+                <select id="log-moon" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-chagra-medium">
+                  <option value="Luna Menguante">Luna Menguante</option>
+                  <option value="Luna Nueva">Luna Nueva</option>
+                  <option value="Cuarto Creciente">Cuarto Creciente</option>
+                  <option value="Luna Llena">Luna Llena</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Cultivo / Eje</label>
+                <input type="text" id="log-crop" placeholder="Ej. Maíz y fríjol" required class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-chagra-medium" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Observación pedagógica y ambiental</label>
+              <textarea id="log-notes" rows="3" placeholder="Describe qué observaron los estudiantes, saberes compartidos o estado del suelo..." required class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-chagra-medium"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Participación comunitaria</label>
+              <input type="text" id="log-actors" placeholder="Ej. Estudiantes 0°-5°, madres de familia" required class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-chagra-medium" />
+            </div>
+            <button type="submit" class="w-full py-2.5 px-4 bg-chagra-primary hover:bg-chagra-dark text-white font-semibold rounded-xl text-sm shadow transition cursor-pointer">
+              <i class="fa-solid fa-plus mr-1"></i> Guardar en Cuaderno de Campo
+            </button>
+          </form>
+        </div>
+
+        <!-- Lista de Registros del Cuaderno de Campo -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="flex items-center justify-between bg-white px-5 py-3.5 rounded-2xl border border-green-100 shadow-sm">
+            <h3 class="font-bold text-chagra-dark text-base">Bitácora de Observación · Sede 14 El Pedregal</h3>
+            <span id="log-count-badge" class="bg-chagra-light text-chagra-primary text-xs font-bold px-3 py-1 rounded-full">0 registros</span>
+          </div>
+          <div id="field-logs-list" class="space-y-4">
+            <!-- Se renderiza dinámicamente mediante JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PESTAÑA 4: COMPARTIR EN COMUNIDAD (PLN)                   -->
+    <!-- ========================================================= -->
+    <section id="tab-compartir" class="hidden space-y-6">
+      <!-- Canales de la Red Personal de Aprendizaje -->
+      <div class="bg-white rounded-2xl shadow-sm border border-green-100 p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-chagra-dark">
+              Red Personal de Aprendizaje (PLN): Escuela, Familia y Territorio
+            </h2>
+            <p class="text-sm text-gray-600 mt-1">
+              Espacios de diálogo horizontal con sabedores de El Pedregal, padres de familia y redes académicas.
+            </p>
+          </div>
+          <a id="link-padlet-external" href="https://padlet.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-tierra-warm hover:bg-tierra-primary text-white font-semibold px-4 py-2.5 rounded-xl text-sm shadow transition shrink-0">
+            <i class="fa-solid fa-up-right-from-square"></i>
+            <span>Abrir Padlet Externo</span>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5">
+          <a href="https://www.whatsapp.com/" target="_blank" rel="noopener noreferrer" class="card-hover flex items-start gap-3 p-4 rounded-xl border border-green-200 bg-green-50/50">
+            <i class="fa-brands fa-whatsapp text-green-600 text-2xl mt-0.5"></i>
+            <div>
+              <h3 class="font-bold text-gray-900 text-sm">WhatsApp Comunitario</h3>
+              <p class="text-xs text-gray-600 mt-1">Notas de voz de abuelos/sabedores y convocatoria a mingas escolares.</p>
+            </div>
+          </a>
+
+          <a href="https://meet.google.com/" target="_blank" rel="noopener noreferrer" class="card-hover flex items-start gap-3 p-4 rounded-xl border border-emerald-200 bg-emerald-50/50">
+            <i class="fa-solid fa-video text-emerald-700 text-xl mt-0.5"></i>
+            <div>
+              <h3 class="font-bold text-gray-900 text-sm">Google Meet Académico</h3>
+              <p class="text-xs text-gray-600 mt-1">Tutorías de maestría e intercambio con redes de docentes rurales.</p>
+            </div>
+          </a>
+
+          <a href="https://x.com/" target="_blank" rel="noopener noreferrer" class="card-hover flex items-start gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50/60">
+            <i class="fa-brands fa-x-twitter text-slate-800 text-xl mt-0.5"></i>
+            <div>
+              <h3 class="font-bold text-gray-900 text-sm">Divulgación en Red (X)</h3>
+              <p class="text-xs text-gray-600 mt-1">Socialización de experiencias bajo #EscuelaRural #LaChagra #Nariño.</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Muro Colaborativo Interactivo Estilo Padlet -->
+      <div class="bg-tierra-soft/70 rounded-2xl border border-amber-200 p-6 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200/70 pb-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-tierra-primary">Muro Interactivo Comunitario</span>
+            <h3 class="font-serif text-xl font-bold text-tierra-dark">
+              Saberes, Semillas y Recetas de la Chagra de El Pedregal
+            </h3>
+          </div>
+          <button onclick="toggleWallForm()" class="inline-flex items-center gap-2 bg-chagra-primary hover:bg-chagra-dark text-white font-semibold px-4 py-2 rounded-xl text-sm shadow transition cursor-pointer">
+            <i class="fa-solid fa-plus"></i>
+            <span>Publicar Aporte en el Muro</span>
+          </button>
+        </div>
+
+        <!-- Formulario desplegable para nueva tarjeta en el muro -->
+        <form id="wall-form" onsubmit="addWallPost(event)" class="hidden bg-white p-5 rounded-2xl border border-amber-200 shadow-sm space-y-4">
+          <h4 class="font-bold text-gray-800 text-sm">Compartir un saber tradicional o experiencia en la chagra</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Nombre del sabedor, familia o estudiante</label>
+              <input type="text" id="wall-author" placeholder="Ej. Familia Rojas · Vereda El Pedregal" required class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-tierra-warm" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Categoría del saber</label>
+              <select id="wall-category" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-tierra-warm">
+                <option value="Semillas nativas">Semillas nativas</option>
+                <option value="Plantas medicinales">Plantas medicinales</option>
+                <option value="Recetas tradicionales">Recetas tradicionales</option>
+                <option value="Cuidado del agua y suelo">Cuidado del agua y suelo</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Relato, consejo de siembra o preparación</label>
+            <textarea id="wall-content" rows="3" placeholder="Escribe aquí el conocimiento compartido por la comunidad..." required class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-tierra-warm"></textarea>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button type="button" onclick="toggleWallForm()" class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-100 cursor-pointer">Cancelar</button>
+            <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold bg-tierra-warm hover:bg-tierra-primary text-white shadow cursor-pointer">Publicar en el Muro</button>
+          </div>
+        </form>
+
+        <!-- Tarjetas del Muro -->
+        <div id="community-wall-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Se renderiza dinámicamente mediante JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de Página Académico -->
+  <footer class="bg-white border-t border-green-100 mt-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600">
+      <div>
+        <p class="font-semibold text-chagra-dark">Alba Lucy Revelo Chasoy · Maestría en Educación Virtual (Universidad de Nariño)</p>
+        <p>Sede 14 El Pedregal · Institución Educativa Media Académica Sagrado Corazón de Jesús · San Lorenzo, Nariño (2026)</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="openConfigModal()" class="text-chagra-primary hover:underline font-semibold cursor-pointer">
+          Editar Enlaces y Descargar HTML
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: CONFIGURAR ENLACES Y EXPORTAR HTML PARA BLOGGER    -->
+  <!-- ========================================================= -->
+  <div id="config-modal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-green-100 overflow-hidden">
+      <div class="bg-chagra-dark text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="font-serif font-bold text-lg flex items-center gap-2">
+          <i class="fa-solid fa-gear"></i>
+          <span>Personalizar Enlaces y Exportar Página</span>
+        </h3>
+        <button onclick="closeConfigModal()" class="text-white/80 hover:text-white cursor-pointer">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto text-sm">
+        <p class="text-gray-600 text-xs leading-relaxed">
+          Pega aquí las URLs públicas de tus herramientas (Mindomo, Symbaloo, Padlet y carpeta de Drive). Luego puedes <strong>Guardar cambios</strong> o <strong>Descargar el archivo HTML</strong> ya actualizado para subirlo o pegarlo directamente en Blogger.
+        </p>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Enlace de tu Mapa Mental en Mindomo (con permiso de lectura)</label>
+            <input type="url" id="cfg-mindomo" placeholder="https://www.mindomo.com/mindmap/..." class="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-chagra-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Enlace de tu Tablero Webmix en Symbaloo EDU</label>
+            <input type="url" id="cfg-symbaloo" placeholder="https://www.symbaloo.com/mix/..." class="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-chagra-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Enlace de tu Muro en Padlet</label>
+            <input type="url" id="cfg-padlet" placeholder="https://padlet.com/..." class="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-chagra-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Enlace de Carpeta Google Drive (Guías descargables)</label>
+            <input type="url" id="cfg-drive" placeholder="https://drive.google.com/drive/folders/..." class="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-chagra-medium" />
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-gray-100 flex flex-col sm:flex-row gap-2 justify-end">
+          <button onclick="saveConfigLinks()" class="px-4 py-2.5 bg-chagra-medium hover:bg-chagra-primary text-white font-semibold rounded-xl text-xs transition cursor-pointer">
+            <i class="fa-solid fa-check mr-1"></i> Aplicar en esta página
+          </button>
+          <button onclick="copyHtmlToClipboard()" class="px-4 py-2.5 bg-amber-100 hover:bg-amber-200 text-tierra-dark font-semibold rounded-xl text-xs transition cursor-pointer">
+            <i class="fa-regular fa-copy mr-1"></i> Copiar código para Blogger
+          </button>
+          <button onclick="exportCustomHtmlFile()" class="px-4 py-2.5 bg-tierra-warm hover:bg-tierra-primary text-white font-semibold rounded-xl text-xs shadow transition cursor-pointer">
+            <i class="fa-solid fa-download mr-1"></i> Descargar archivo .HTML
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================
+    // DATOS INICIALES CURADOS (REPOSITORIOS, BITÁCORA Y MURO)
+    // =========================================================
+    const curatedResources = [
+      {
+        id: '01',
+        title: 'Portal Colombia Aprende – Colección Educación Rural',
+        author: 'Ministerio de Educación Nacional de Colombia [MEN]',
+        type: 'repositorio',
+        typeLabel: 'Repositorio Digital',
+        license: 'Licencia institucional abierta MEN',
+        url: 'https://colombiaaprende.edu.co/contenidos/coleccion/educacion-rural',
+        description: 'Secuencias didácticas y guías para aulas multigrado sobre ecosistemas, composición del suelo agrícola y ciclos de la vida, articulables con la chagra escolar.'
+      },
+      {
+        id: '05',
+        title: 'Repositorio Institucional Universidad de Nariño (SIRED – La Chagra)',
+        author: 'Universidad de Nariño',
+        type: 'repositorio',
+        typeLabel: 'Repositorio Regional',
+        license: 'CC BY-NC-ND 4.0',
+        url: 'https://www.udenar.edu.co/la-chagra/',
+        description: 'Investigaciones locales y proyectos universitarios sobre la chagra nariñense, agrobiodiversidad andina y pedagogías propias del territorio.'
+      },
+      {
+        id: '02',
+        title: 'Redalyc – Saberes campesinos y huertos pedagógicos',
+        author: 'Red de Revistas Científicas de América Latina y el Caribe',
+        type: 'cientifico',
+        typeLabel: 'Artículos Científicos',
+        license: 'CC BY-NC-SA 4.0',
+        url: 'https://www.redalyc.org/',
+        description: 'Hemeroteca científica de acceso abierto con estudios empíricos sobre soberanía alimentaria, huertos escolares y diálogo de saberes en comunidades campesinas.'
+      },
+      {
+        id: '03',
+        title: 'Dialnet – Tesis y literatura hispana sobre educación rural',
+        author: 'Fundación Dialnet (Universidad de La Rioja)',
+        type: 'cientifico',
+        typeLabel: 'Tesis y Literatura',
+        license: 'Acceso abierto institucional',
+        url: 'https://dialnet.unirioja.es/servlet/tesis?codigo=347726',
+        description: 'Base de datos de tesis de maestría y doctorado enfocadas en Escuela Nueva, Proyectos Ambientales Escolares (PRAE) y rescate de saberes rurales.'
+      },
+      {
+        id: '04',
+        title: 'Prácticas tradicionales de la chagra y manejo de semillas nativas',
+        author: 'Colectivo Agroecológico Andino (YouTube)',
+        type: 'audiovisual',
+        typeLabel: 'Video Documental',
+        license: 'Licencia estándar de YouTube',
+        url: 'https://www.youtube.com/watch?v=zGeaeNhnDDs',
+        description: 'Registro audiovisual sobre preparación orgánica del suelo, control natural de plagas y selección de semillas criollas para dialogar con los mayores de la vereda.'
+      }
+    ];
+
+    const defaultFieldLogs = [
+      {
+        id: 1,
+        date: '2026-10-15',
+        moon: 'Luna Menguante',
+        crop: 'Preparación del terreno y abono orgánico',
+        notes: 'Los estudiantes de grados 0° a 5° analizaron la textura y humedad del suelo de la chagra escolar. Con orientación de dos padres de familia se separaron residuos orgánicos para compostaje, evitando el uso de agroquímicos.',
+        actors: 'Estudiantes multigrado (11 niños), docente Alba Lucy y 2 padres de familia'
+      },
+      {
+        id: 2,
+        date: '2026-11-04',
+        moon: 'Cuarto Creciente',
+        crop: 'Siembra asociada: Maíz, fríjol y calabaza',
+        notes: 'Se realizó la siembra tradicional en asociación (milpa). Los niños registraron en sus cuadernos la distancia entre surcos y dialogaron con un abuelo de la vereda sobre la importancia de conservar semillas propias frente a las comerciales.',
+        actors: 'Estudiantes multigrado, sabedor local y docente investigadora'
+      }
+    ];
+
+    const defaultWallPosts = [
+      {
+        id: 101,
+        author: 'Don José · Sabedor de El Pedregal',
+        category: 'Semillas nativas',
+        content: 'La semilla propia de maíz capio y fríjol cargamanto se guarda seca junto al fogón o en frascos bien cerrados con ceniza para que no le entre gorgojo y resista los veranos largos.',
+        likes: 6
+      },
+      {
+        id: 102,
+        author: 'Señora María · Madre de familia',
+        category: 'Plantas medicinales',
+        content: 'En los bordes de la chagra siempre sembramos ruda, caléndula, manzanilla y hierbabuena; sirven tanto para aliviar dolores de estómago como para espantar insectos de las hortalizas sin usar venenos.',
+        likes: 8
+      },
+      {
+        id: 103,
+        author: 'Estudiantes Grados 3°, 4° y 5°',
+        category: 'Cuidado del agua y suelo',
+        content: 'Aprendimos que sembrar árboles nativos cerca de las nacientes y cubrir la tierra con hojarasca guarda la humedad cuando disminuyen las quebradas de nuestra vereda.',
+        likes: 9
+      }
+    ];
+
+    // =========================================================
+    // ESTADO Y ALMACENAMIENTO LOCAL (LOCALSTORAGE)
+    // =========================================================
+    let fieldLogs = JSON.parse(localStorage.getItem('chagra_field_logs')) || defaultFieldLogs;
+    let wallPosts = JSON.parse(localStorage.getItem('chagra_wall_posts')) || defaultWallPosts;
+    let pleLinks = JSON.parse(localStorage.getItem('chagra_ple_links')) || {
+      mindomo: 'https://www.mindomo.com/',
+      symbaloo: 'https://www.symbaloo.com/',
+      padlet: 'https://padlet.com/',
+      drive: 'https://drive.google.com/'
+    };
+
+    // =========================================================
+    // FUNCIONES DE INTERFAZ Y NAVEGACIÓN
+    // =========================================================
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'bg-chagra-dark text-white text-xs sm:text-sm font-medium px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 pointer-events-auto transition-opacity duration-300';
+      toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function switchTab(tabId) {
+      const tabs = ['inicio', 'leer', 'hacer', 'compartir'];
+      tabs.forEach(t => {
+        const section = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`btn-tab-${t}`);
+        if (t === tabId) {
+          section.classList.remove('hidden');
+          btn.classList.remove('tab-inactive');
+          btn.classList.add('tab-active');
+        } else {
+          section.classList.add('hidden');
+          btn.classList.remove('tab-active');
+          btn.classList.add('tab-inactive');
+        }
+      });
+    }
+
+    function applySavedLinks() {
+      document.getElementById('link-mindomo-hero').href = pleLinks.mindomo || 'https://www.mindomo.com/';
+      document.getElementById('link-symbaloo-hero').href = pleLinks.symbaloo || 'https://www.symbaloo.com/';
+      document.getElementById('link-padlet-external').href = pleLinks.padlet || 'https://padlet.com/';
+
+      document.getElementById('cfg-mindomo').value = pleLinks.mindomo;
+      document.getElementById('cfg-symbaloo').value = pleLinks.symbaloo;
+      document.getElementById('cfg-padlet').value = pleLinks.padlet;
+      document.getElementById('cfg-drive').value = pleLinks.drive;
+    }
+
+    // =========================================================
+    // RENDERIZADO PESTAÑA 2: RECURSOS CURADOS
+    // =========================================================
+    function renderResources(list) {
+      const grid = document.getElementById('resources-grid');
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500 text-sm bg-white rounded-2xl border border-gray-100">No se encontraron recursos con ese criterio de búsqueda.</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(res => `
+        <article class="card-hover bg-white rounded-2xl border border-green-100 p-5 flex flex-col justify-between space-y-4">
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="bg-chagra-light text-chagra-primary font-bold text-xs px-2.5 py-1 rounded-lg">Ficha ${res.id} · ${res.typeLabel}</span>
+              <span class="text-[11px] text-gray-500 font-medium">${res.license}</span>
+            </div>
+            <h3 class="font-bold text-gray-900 text-base leading-snug">${res.title}</h3>
+            <p class="text-xs font-medium text-chagra-medium">${res.author}</p>
+            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">${res.description}</p>
+          </div>
+          <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
+            <a href="${res.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-chagra-primary hover:text-chagra-dark">
+              <span>Abrir recurso oficial</span>
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function filterResources() {
+      const query = document.getElementById('search-resources').value.toLowerCase().trim();
+      const type = document.getElementById('filter-resource-type').value;
+
+      const filtered = curatedResources.filter(r => {
+        const matchesType = type === 'all' || r.type === type;
+        const matchesText = r.title.toLowerCase().includes(query) ||
+                            r.description.toLowerCase().includes(query) ||
+                            r.author.toLowerCase().includes(query);
+        return matchesType && matchesText;
+      });
+      renderResources(filtered);
+    }
+
+    function downloadOfflineGuide() {
+      const content = `GUÍA DE CAMPO OFFLINE - LA CHAGRA COMO AULA VIVA
+Institución Educativa Media Académica Sagrado Corazón de Jesús - Sede 14 El Pedregal
+Municipio de San Lorenzo, Nariño | Docente: Alba Lucy Revelo Chasoy
+
+1. PROPÓSITO PEDAGÓGICO
+Articular los saberes propios campesinos con las Ciencias Naturales y la Educación Ambiental en aula multigrado (grados 0° a 5°).
+
+2. EJES DE OBSERVACIÓN EN LA CHAGRA ESCOLAR
+- Suelo y abonos orgánicos: Identificación de materia orgánica, lombricompuesto y rechazo de agroquímicos.
+- Semillas propias y biodiversidad: Asociación tradicional de cultivos (maíz, fríjol, calabaza, aromáticas y medicinales).
+- Cuidado del agua y residuos: Manejo responsable de residuos sólidos en la vereda y protección de nacientes.
+- Calendario lunar: Registro de fases de la luna (Menguante, Nueva, Creciente, Llena) y saberes de los mayores.
+
+3. ENLACES DEL ENTORNO PERSONAL DE APRENDIZAJE (PLE)
+- Colombia Aprende Rural: https://colombiaaprende.edu.co/contenidos/coleccion/educacion-rural
+- Repositorio SIRED Udenar: https://www.udenar.edu.co/la-chagra/
+- Carpeta Drive del proyecto: ${pleLinks.drive}
+`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Guia_Campo_La_Chagra_El_Pedregal.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Guía de campo descargada para uso sin conexión.');
+    }
+
+    // =========================================================
+    // RENDERIZADO PESTAÑA 3: CUADERNO DE CAMPO INTERACTIVO
+    // =========================================================
+    function renderFieldLogs() {
+      const list = document.getElementById('field-logs-list');
+      const badge = document.getElementById('log-count-badge');
+      badge.textContent = `${fieldLogs.length} registro${fieldLogs.length === 1 ? '' : 's'}`;
+
+      if (fieldLogs.length === 0) {
+        list.innerHTML = `<div class="bg-white rounded-2xl border border-gray-100 p-6 text-center text-sm text-gray-500">Aún no hay registros en el cuaderno de campo. Agrega el primero usando el formulario.</div>`;
+        return;
+      }
+
+      list.innerHTML = fieldLogs.map(log => `
+        <div class="bg-white rounded-2xl border border-green-100 p-5 shadow-sm space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="bg-chagra-primary text-white text-xs font-bold px-2.5 py-1 rounded-lg">${log.date}</span>
+              <span class="bg-amber-100 text-tierra-dark text-xs font-semibold px-2.5 py-1 rounded-lg">
+                <i class="fa-solid fa-moon mr-1"></i>${log.moon}
+              </span>
+            </div>
+            <button onclick="deleteFieldLog(${log.id})" title="Eliminar registro" class="text-gray-400 hover:text-red-600 text-xs cursor-pointer">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+          <h4 class="font-bold text-gray-900 text-base">${log.crop}</h4>
+          <p class="text-sm text-gray-700 leading-relaxed">${log.notes}</p>
+          <div class="pt-2 border-t border-gray-100 text-xs text-chagra-medium font-medium flex items-center gap-1.5">
+            <i class="fa-solid fa-users"></i>
+            <span>${log.actors}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addFieldLog(e) {
+      e.preventDefault();
+      const newLog = {
+        id: Date.now(),
+        date: document.getElementById('log-date').value,
+        moon: document.getElementById('log-moon').value,
+        crop: document.getElementById('log-crop').value.trim(),
+        notes: document.getElementById('log-notes').value.trim(),
+        actors: document.getElementById('log-actors').value.trim()
+      };
+      fieldLogs.unshift(newLog);
+      localStorage.setItem('chagra_field_logs', JSON.stringify(fieldLogs));
+      renderFieldLogs();
+      e.target.reset();
+      document.getElementById('log-date').valueAsDate = new Date();
+      showToast('Registro añadido al cuaderno de campo de la chagra.');
+    }
+
+    function deleteFieldLog(id) {
+      fieldLogs = fieldLogs.filter(l => l.id !== id);
+      localStorage.setItem('chagra_field_logs', JSON.stringify(fieldLogs));
+      renderFieldLogs();
+      showToast('Registro eliminado del cuaderno.');
+    }
+
+    // =========================================================
+    // RENDERIZADO PESTAÑA 4: MURO COMUNITARIO (PLN)
+    // =========================================================
+    function toggleWallForm() {
+      const form = document.getElementById('wall-form');
+      form.classList.toggle('hidden');
+    }
+
+    function renderWallPosts() {
+      const grid = document.getElementById('community-wall-grid');
+      grid.innerHTML = wallPosts.map(post => `
+        <div class="card-hover bg-white rounded-2xl border border-amber-200/80 p-5 flex flex-col justify-between space-y-3 shadow-xs">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="bg-tierra-light text-tierra-dark text-xs font-bold px-2.5 py-1 rounded-lg">${post.category}</span>
+              <button onclick="deleteWallPost(${post.id})" title="Eliminar tarjeta" class="text-gray-300 hover:text-red-500 text-xs cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <p class="text-sm text-gray-700 leading-relaxed">"${post.content}"</p>
+          </div>
+          <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+            <span class="font-bold text-chagra-dark">${post.author}</span>
+            <button onclick="likeWallPost(${post.id})" class="inline-flex items-center gap-1 text-tierra-primary hover:text-tierra-dark font-semibold cursor-pointer">
+              <i class="fa-solid fa-heart"></i>
+              <span>${post.likes}</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addWallPost(e) {
+      e.preventDefault();
+      const newPost = {
+        id: Date.now(),
+        author: document.getElementById('wall-author').value.trim(),
+        category: document.getElementById('wall-category').value,
+        content: document.getElementById('wall-content').value.trim(),
+        likes: 1
+      };
+      wallPosts.unshift(newPost);
+      localStorage.setItem('chagra_wall_posts', JSON.stringify(wallPosts));
+      renderWallPosts();
+      e.target.reset();
+      toggleWallForm();
+      showToast('Aporte comunitario publicado en el muro.');
+    }
+
+    function likeWallPost(id) {
+      wallPosts = wallPosts.map(p => p.id === id ? { ...p, likes: p.likes + 1 } : p);
+      localStorage.setItem('chagra_wall_posts', JSON.stringify(wallPosts));
+      renderWallPosts();
+    }
+
+    function deleteWallPost(id) {
+      wallPosts = wallPosts.filter(p => p.id !== id);
+      localStorage.setItem('chagra_wall_posts', JSON.stringify(wallPosts));
+      renderWallPosts();
+      showToast('Tarjeta eliminada del muro.');
+    }
+
+    // =========================================================
+    // CONFIGURACIÓN Y EXPORTACIÓN DEL HTML PERSONALIZADO
+    // =========================================================
+    function openConfigModal() {
+      applySavedLinks();
+      document.getElementById('config-modal').classList.remove('hidden');
+    }
+
+    function closeConfigModal() {
+      document.getElementById('config-modal').classList.add('hidden');
+    }
+
+    function saveConfigLinks() {
+      pleLinks = {
+        mindomo: document.getElementById('cfg-mindomo').value.trim() || 'https://www.mindomo.com/',
+        symbaloo: document.getElementById('cfg-symbaloo').value.trim() || 'https://www.symbaloo.com/',
+        padlet: document.getElementById('cfg-padlet').value.trim() || 'https://padlet.com/',
+        drive: document.getElementById('cfg-drive').value.trim() || 'https://drive.google.com/'
+      };
+      localStorage.setItem('chagra_ple_links', JSON.stringify(pleLinks));
+      applySavedLinks();
+      showToast('Enlaces actualizados correctamente en tu PLE.');
+    }
+
+    function buildExportableHtml() {
+      saveConfigLinks();
+      let htmlSource = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      // Inyectar los datos actuales (enlaces, cuaderno de campo y muro) en el código exportado
+      htmlSource = htmlSource.replace(
+        /let fieldLogs = JSON\.parse\(localStorage\.getItem\('chagra_field_logs'\)\) \|\| defaultFieldLogs;/,
+        `let fieldLogs = JSON.parse(localStorage.getItem('chagra_field_logs')) || ${JSON.stringify(fieldLogs)};`
+      );
+      htmlSource = htmlSource.replace(
+        /let wallPosts = JSON\.parse\(localStorage\.getItem\('chagra_wall_posts'\)\) \|\| defaultWallPosts;/,
+        `let wallPosts = JSON.parse(localStorage.getItem('chagra_wall_posts')) || ${JSON.stringify(wallPosts)};`
+      );
+      htmlSource = htmlSource.replace(
+        /let pleLinks = JSON\.parse\(localStorage\.getItem\('chagra_ple_links'\)\) \|\| \{[\s\S]*?\};/,
+        `let pleLinks = JSON.parse(localStorage.getItem('chagra_ple_links')) || ${JSON.stringify(pleLinks)};`
+      );
+      return htmlSource;
+    }
+
+    function copyHtmlToClipboard() {
+      const code = buildExportableHtml();
+      const textarea = document.createElement('textarea');
+      textarea.value = code;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      showToast('Código HTML copiado. Pégalo en Vista HTML de Blogger.');
+    }
+
+    function exportCustomHtmlFile() {
+      const code = buildExportableHtml();
+      const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'PLE_La_Chagra_Aula_Viva.html';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Archivo HTML descargado con tus enlaces y registros.');
+    }
+
+    // Inicialización al cargar la página
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('log-date').valueAsDate = new Date();
+      applySavedLinks();
+      renderResources(curatedResources);
+      renderFieldLogs();
+      renderWallPosts();
+    });
+  </script>
+</body>
+</html>
